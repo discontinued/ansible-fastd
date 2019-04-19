@@ -1,0 +1,14 @@
+---
+
+- name: check for variables
+  when: >
+    (vars[item] is not defined) or
+    ( vars[item] is defined and not vars[item] ) or
+    ( vars[item] is defined and vars[item]|length == 0 )
+  with_items: "{{ fastd_required }}"
+  fail:
+    msg: >
+      Required variables not defined or empty.
+
+- include_tasks: fastd.yml
+  when: ansible_os_family == "RedHat"

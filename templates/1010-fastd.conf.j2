@@ -1,0 +1,13 @@
+{% for instance in fastd_instances %}
+{% if instance.bind_port is defined %}
+domain (ip6 ip) table filter {
+chain INPUT {
+{% if instance.bind_interface is defined %}
+proto udp dport {{instance.bind_port}} ACCEPT;
+{% else %}
+interface {{instance.bind_interface}} proto udp dport {{instance.bind_port}} ACCEPT;
+{% endif %}
+}
+}
+{% endif %}
+{% endfor %}

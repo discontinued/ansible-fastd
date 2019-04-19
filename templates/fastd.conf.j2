@@ -1,0 +1,119 @@
+#
+# This file is managed by ansible. Do not edit by hand!
+#
+
+bind {{item.bind_address|default('any')}} port {{item.bind_port|default('0')}} {% if item.bind_interface is defined %}interface "{{item.bind_interface}}"{% endif %};
+include "secret.conf";
+interface "{{item.interface}}";
+log level {{item.loglevel|default('warn')}};
+{% if item.syslog_level is defined %}
+log to syslog level {{item.syslog_level}};
+{% endif %}
+{% if item.stderr_level is defined %}
+log to syslog level {{item.stderr_level}};
+{% endif %}
+mode {{item.mode|default('tun')}};
+method "{{item.method|default('salsa2012+umac')}}";
+{% if item.peer_limit is defined %}
+peer limit {{item.peer_limit}};
+{% endif %}
+hide ip addresses {{item.hide_ip_addressess|default('yes')}};
+mtu {{item.mtu|default('1426')}};
+secure handshakes {{item.secure_handshake|default('yes')}};
+{% if item.status_socket is defined %}
+status socket "{{item.status_socket}}";
+{% endif %}
+user "{{fastd_user_name}}";
+group "{{fastd_user_name}}";
+drop capabilities {{item.drop_capabilities|default('yes')}};
+forward {{item.forward|default('no')}};
+hide mac addresses {{item.hide_mac_addresses|default('yes')}};
+{% if item.includes is defined %}
+{% for include in item.includes %}
+include {{include}};
+{% endfor %}
+{% endif %}
+{% if item.peer_includes is defined %}
+{% for include in item.peers %}
+{% if include.file is defined %}
+include peer "{{include.file}}" {% if include.name is defined %}[ as "{{include.name}}" ]{% endif %};
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if item.peer_dir is defined %}
+include peers from "{{item.peer_dir}}";
+{% endif %}
+{% if item.mac is defined %}
+mac "{{item.mac.name}}" use "{{item.mac.implementation}}";
+{% endif %}
+{% if item.packet_mark is defined %}
+packet mark {{item.packet_mark}};
+{% endif %}
+{% if item.on_pre_up_script is defined %}
+on pre-up "
+  {{item.on_pre_up_script}}
+";
+{% endif %}
+{% if item.on_up_script is defined %}
+on up "
+  {{item.on_up_script}}
+";
+{% endif %}
+
+{% if item.on_verify_script is defined %}
+on verify "
+  {{item.on_verify_script}}
+";
+{% endif %}
+{% if item.on_down_script is defined %}
+on down "
+  {{item.on_down_script}}
+";
+{% endif %}
+{% if item.on_post_down_script is defined %}
+on post-down "
+  {{item.on_post_down_script}}
+";
+{% endif %}
+{% if item.on_connect_script is defined %}
+on connect "
+  {{item.on_connect_script}}
+";
+{% endif %}
+{% if item.on_establish_script is defined %}
+on establish "
+  {{item.on_establish_script}}
+";
+{% endif %}
+{% if item.on_disestablish_script is defined %}
+on disestablish "
+  {{item.on_disestablish_script}}
+";
+{% endif %}
+
+{% if item.peers is defined and item.peer_dir is not defined %}
+{% for peer in item.peers %}
+peer "{{peer.name}}" {
+key "{{peer.key}}";
+{% if peer.float is defined %}
+float {{peer.float}};
+{% endif %}
+{% if peer.mtu is defined %}
+mtu {{peer.mtu}}; 
+{% endif %}
+{% if peer.remote is defined %}
+{% for remote in peer.remote %}
+remote {{remote}}; 
+{% endfor %}
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+
+{% if item.peer_groups is defined %}
+{% for peer_group in item.peer_groups %}
+peer group "{{peer_group-name}}" {
+  
+};
+{% endfor %}
+{% endif %}

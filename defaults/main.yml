@@ -1,0 +1,10 @@
+---
+
+fastd_user_name: fastd
+fastd_user_shell: /bin/false
+fastd_instances_secret:
+fastd_instances:
+
+fastd_required:
+  - fastd_instances
+  - fastd_instances_secret

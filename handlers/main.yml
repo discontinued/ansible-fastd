@@ -1,0 +1,7 @@
+---
+
+- name: fastd restart
+  service: name=fastd@{{ item.name }}.service state=restarted
+  no_log: true
+  with_items:
+    - "{{ fastd_instances }}"
