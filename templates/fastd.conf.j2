@@ -26,7 +26,13 @@ status socket "{{item.status_socket}}";
 user "{{fastd_user_name}}";
 group "{{fastd_user_name}}";
 drop capabilities {{item.drop_capabilities|default('yes')}};
-forward {{item.forward|default('no')}};
+{% if item.forward is defined %}
+{% if item.forward|bool %}
+forward yes;
+{% else %}
+forward no;
+{% endif %}
+{% endif %}
 hide mac addresses {{item.hide_mac_addresses|default('yes')}};
 {% if item.includes is defined %}
 {% for include in item.includes %}
@@ -96,7 +102,11 @@ on disestablish "
 peer "{{peer.name}}" {
 key "{{peer.key}}";
 {% if peer.float is defined %}
-float {{peer.float}};
+{% if peer.float|bool %}
+float yes;
+{% else %}
+float no;
+{% endif %}
 {% endif %}
 {% if peer.mtu is defined %}
 mtu {{peer.mtu}}; 

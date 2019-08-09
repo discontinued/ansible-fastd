@@ -16,13 +16,11 @@
 
 - name: create fastd instance config directories
   file: path=/etc/fastd/{{ item.name }} state=directory owner={{ fastd_user_name }} group={{ fastd_user_name }} mode=0700
-  no_log: true
   with_items:
     - "{{ fastd_instances }}"
 
 - name: create fastd configuration
   template: src=templates/fastd.conf.j2 dest=/etc/fastd/{{ item.name }}/fastd.conf owner={{ fastd_user_name }} group={{ fastd_user_name }} mode=0600
-  no_log: true
   with_items:
     - "{{ fastd_instances }}"
   notify: fastd restart
@@ -37,19 +35,17 @@
 - name: create fastd peer include directories
   when: item.peer_dir is defined
   file: dest={{ item.peer_dir }} state=directory owner={{ fastd_user_name }} group={{ fastd_user_name }} mode=0700
-  no_log: true
   with_items:
     - "{{ fastd_instances }}"
 
 - name: Create fastd peer configs
   when: item.0.peer_dir is defined
   template: src=templates/peer.config.j2 dest="{{ item.0.peer_dir }}/{{ item.1.name }}" owner={{ fastd_user_name }} group={{ fastd_user_name }} mode=0600
-  no_log: true
   with_subelements:
     - "{{ fastd_instances | selectattr('peers', 'defined') | list }}"
     - peers
 
-- name: create ssh firewall rules
+- name: create fastd firewall rules
   template: src=templates/1010-fastd.conf.j2 dest=/etc/ferm/ferm.d/1010-fastd.conf owner=root group=root
   # notify:
   #   - ferm restart
@@ -59,6 +55,5 @@
 
 - name: fastd needs to autostart
   service: name=fastd@{{ item.name }}.service enabled=yes state=restarted
-  no_log: true
   with_items:
     - "{{ fastd_instances }}"
