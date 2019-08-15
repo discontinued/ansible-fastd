@@ -47,8 +47,8 @@
 
 - name: create fastd firewall rules
   template: src=templates/1010-fastd.conf.j2 dest=/etc/ferm/ferm.d/1010-fastd.conf owner=root group=root
-  # notify:
-  #   - ferm restart
+  notify:
+    - ferm restart
 
 - name: create fastd service
   template: src=templates/fastd@.service.j2 dest=/usr/lib/systemd/system/fastd@.service.j2 owner=root group=root
